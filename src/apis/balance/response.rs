@@ -30,6 +30,7 @@ pub struct BalanceResponse {
     pub name: String,
     pub activity_code: usize,
     pub activity_name: String,
+    pub is_ngo: bool,
     pub balance: BTreeMap<BalanceIndicator, RawBalance>,
 }
 
@@ -56,6 +57,7 @@ impl From<BalanceRawResponse> for BalanceResponse {
             name: value.name,
             activity_code: value.activity_code,
             activity_name: value.activity_name,
+            is_ngo,
             balance,
         }
     }
