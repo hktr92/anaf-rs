@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-pub type CultResponse = Vec<CultResponseItem>;
+use crate::ApiResponse;
+
+pub type CultResponse = ApiResponse<CultResponseItem>;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CultResponseItem {

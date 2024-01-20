@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-pub type FarmerResponse = Vec<FarmerResponseItem>;
+use crate::ApiResponse;
+
+pub type FarmerResponse = ApiResponse<FarmerResponseItem>;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FarmerResponseItem {
