@@ -6,6 +6,12 @@ pub enum FarmerApiVersion {
     V2,
 }
 
+impl FarmerApiVersion {
+    pub fn latest() -> Self {
+        Self::default()
+    }
+}
+
 impl Display for FarmerApiVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

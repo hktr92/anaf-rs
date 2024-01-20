@@ -6,6 +6,12 @@ pub enum CultApiVersion {
     V2,
 }
 
+impl CultApiVersion {
+    pub fn latest() -> Self {
+        Self::default()
+    }
+}
+
 impl Display for CultApiVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

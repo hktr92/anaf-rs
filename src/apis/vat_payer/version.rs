@@ -7,6 +7,16 @@ pub enum VatPayerApiVersion {
     V7,
 }
 
+impl VatPayerApiVersion {
+    pub fn latest() -> Self {
+        Self::default()
+    }
+
+    pub fn all() -> Vec<Self> {
+        vec![Self::V8, Self::V7]
+    }
+}
+
 impl Display for VatPayerApiVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -17,15 +27,5 @@ impl Display for VatPayerApiVersion {
                 VatPayerApiVersion::V7 => "v7",
             }
         )
-    }
-}
-
-impl VatPayerApiVersion {
-    pub fn latest() -> Self {
-        Self::default()
-    }
-
-    pub fn all() -> Vec<Self> {
-        vec![Self::V8, Self::V7]
     }
 }

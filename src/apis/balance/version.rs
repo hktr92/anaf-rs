@@ -6,6 +6,12 @@ pub enum BalanceApiVersion {
     V1,
 }
 
+impl BalanceApiVersion {
+    pub fn latest() -> Self {
+        Self::default()
+    }
+}
+
 impl Display for BalanceApiVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -15,11 +21,5 @@ impl Display for BalanceApiVersion {
                 BalanceApiVersion::V1 => "v1",
             }
         )
-    }
-}
-
-impl BalanceApiVersion {
-    pub fn latest() -> Self {
-        Self::default()
     }
 }
