@@ -48,7 +48,7 @@ impl BalanceApi {
         tracing::debug!("URL: {:#?}", url);
         tracing::debug!("Request: {:#?}", request);
 
-        let response = self.client.post(url).send().await?;
+        let response = self.client.get(url).send().await?;
 
         match response.status() {
             StatusCode::SERVICE_UNAVAILABLE => Err(ApiError::ServiceUnavailable),
