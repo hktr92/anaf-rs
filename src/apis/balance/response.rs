@@ -19,6 +19,7 @@ pub struct BalanceRawResponse {
     #[serde(alias = "den_caen")]
     pub activity_name: String,
 
+    #[serde(alias = "i")]
     pub balance: Vec<RawBalance>,
 }
 
