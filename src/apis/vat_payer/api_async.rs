@@ -1,6 +1,6 @@
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 
-use crate::ApiRequest;
+use crate::{ApiError, ApiRequest, Result};
 
 use super::{VatPayerApiVersion, VatPayerAsyncResponse, VatPayerAsyncToken, VatPayerResponse};
 
@@ -22,11 +22,9 @@ impl VatPayerAsyncApi {
 }
 
 impl VatPayerAsyncApi {
-    pub async fn send(&self, request: Vec<ApiRequest>) -> anyhow::Result<VatPayerAsyncResponse> {
-        if request.len() >= 500 {
-            anyhow::bail!(
-                "ANAF VatPayer Async API supports maximum number of 500 companies to fetch"
-            );
+    pub async fn send(&self, request: Vec<ApiRequest>) -> Result<VatPayerAsyncResponse> {
+        if request.is_empty() || request.len() >= 500 {
+            return Err(ApiError::InvalidRequestError(request.len()));
         }
 
         tracing::info!(
@@ -43,13 +41,22 @@ impl VatPayerAsyncApi {
             .send()
             .await?;
 
-        let response = response.json::<VatPayerAsyncResponse>().await?;
-
-        tracing::debug!("Response: {:#?}", response);
-
-        Ok(response)
+        match response.status() {
+            StatusCode::SERVICE_UNAVAILABLE => Err(ApiError::ServiceUnavailable),
+            StatusCode::OK => {
+                let response = response.json::<VatPayerAsyncResponse>().await?;
+                tracing::debug!("Response: {:#?}", response);
+                Ok(response)
+            }
+            _ => {
+                let response = response.text().await?;
+                tracing::debug!("Error Response: {:#?}", response);
+                Err(ApiError::ApiError(response))
+            }
+        }
     }
 
+    // TODO: finish the implementation
     pub async fn fetch(&self, token: VatPayerAsyncToken) -> anyhow::Result<VatPayerResponse> {
         // TODO: implement retry logic: min 2 seconds, min 10 seconds between retries
 

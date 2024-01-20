@@ -21,4 +21,10 @@ pub enum ApiError {
 
     #[error("Reqwest error: {0}")]
     ReqwestError(#[from] reqwest::Error),
+
+    #[error("JSON error: {0}")]
+    JsonError(#[from] serde_json::Error),
+
+    #[error("Query String error: {0}")]
+    QueryStringError(#[from] serde_qs::Error),
 }

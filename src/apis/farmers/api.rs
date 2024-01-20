@@ -1,6 +1,6 @@
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 
-use crate::ApiRequest;
+use crate::{ApiError, ApiRequest, Result};
 
 use super::{FarmerApiVersion, FarmerResponse};
 
@@ -22,9 +22,9 @@ impl FarmerApi {
 }
 
 impl FarmerApi {
-    pub async fn send(&self, request: Vec<ApiRequest>) -> anyhow::Result<FarmerResponse> {
-        if request.len() >= 500 {
-            anyhow::bail!("ANAF Farmer API supports maximum number of 500 companies to fetch");
+    pub async fn send(&self, request: Vec<ApiRequest>) -> Result<FarmerResponse> {
+        if request.is_empty() || request.len() >= 500 {
+            return Err(ApiError::InvalidRequestError(request.len()));
         }
 
         tracing::info!(
@@ -41,10 +41,18 @@ impl FarmerApi {
             .send()
             .await?;
 
-        let response = response.json::<FarmerResponse>().await?;
-
-        tracing::debug!("Response: {:#?}", response);
-
-        Ok(response)
+        match response.status() {
+            StatusCode::SERVICE_UNAVAILABLE => Err(ApiError::ServiceUnavailable),
+            StatusCode::OK => {
+                let response = response.json::<FarmerResponse>().await?;
+                tracing::debug!("Response: {:#?}", response);
+                Ok(response)
+            }
+            _ => {
+                let response = response.text().await?;
+                tracing::debug!("Error Response: {:#?}", response);
+                Err(ApiError::ApiError(response))
+            }
+        }
     }
 }
