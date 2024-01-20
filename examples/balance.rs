@@ -18,6 +18,9 @@ async fn main() -> anyhow::Result<()> {
 
     dbg!(&response);
 
+    let response = serde_json::to_string_pretty(&response)?;
+    println!("{}", response);
+
     Ok(())
 }
 

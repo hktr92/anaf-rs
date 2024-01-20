@@ -1,6 +1,8 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fmt::Display};
 
 use serde::{Deserialize, Serialize};
+
+use super::Balance;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BalanceRawResponse {
@@ -25,13 +27,13 @@ pub struct BalanceRawResponse {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct BalanceResponse {
+    pub kind: EntityKind,
     pub year: usize,
     pub unique_registration_code: usize,
     pub name: String,
     pub activity_code: usize,
     pub activity_name: String,
-    pub is_ngo: bool,
-    pub balance: BTreeMap<BalanceIndicator, RawBalance>,
+    pub balance: Balance,
 }
 
 impl From<BalanceRawResponse> for BalanceResponse {
@@ -43,24 +45,36 @@ impl From<BalanceRawResponse> for BalanceResponse {
                 .balance
                 .into_iter()
                 .map(|it| (BalanceIndicator::Ngo(it.clone().code.into()), it))
-                .collect(),
+                .collect::<BTreeMap<BalanceIndicator, RawBalance>>()
+                .into(),
             false => value
                 .balance
                 .into_iter()
                 .map(|it| (BalanceIndicator::Company(it.clone().code.into()), it))
-                .collect(),
+                .collect::<BTreeMap<BalanceIndicator, RawBalance>>()
+                .into(),
         };
 
         Self {
+            kind: if is_ngo {
+                EntityKind::Ngo
+            } else {
+                EntityKind::Company
+            },
             year: value.year,
             unique_registration_code: value.unique_registration_code,
             name: value.name,
             activity_code: value.activity_code,
             activity_name: value.activity_name,
-            is_ngo,
             balance,
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub enum EntityKind {
+    Company,
+    Ngo,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -79,6 +93,15 @@ pub struct RawBalance {
 pub enum BalanceIndicator {
     Company(CompanyBalanceIndicatorKind),
     Ngo(NgoBalanceIndicatorKind),
+}
+
+impl Display for BalanceIndicator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BalanceIndicator::Company(it) => write!(f, "{}", it),
+            BalanceIndicator::Ngo(it) => write!(f, "{}", it),
+        }
+    }
 }
 
 impl BalanceIndicator {
@@ -127,6 +150,35 @@ pub enum CompanyBalanceIndicatorKind {
     Inventories,              // I3
     CurrentAssets,            // I2
     FixedAssets,              // I1
+}
+
+impl Display for CompanyBalanceIndicatorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let value = match self {
+            CompanyBalanceIndicatorKind::AverageNumberOfEmployees => "AverageNumberOfEmployees",
+            CompanyBalanceIndicatorKind::NetLoss => "NetLoss",
+            CompanyBalanceIndicatorKind::NetProfit => "NetProfit",
+            CompanyBalanceIndicatorKind::GrossLoss => "GrossLoss",
+            CompanyBalanceIndicatorKind::GrossProfit => "GrossProfit",
+            CompanyBalanceIndicatorKind::TotalExpenditures => "TotalExpenditures",
+            CompanyBalanceIndicatorKind::TotalIncome => "TotalIncome",
+            CompanyBalanceIndicatorKind::NetTurnorver => "NetTurnorver",
+            CompanyBalanceIndicatorKind::HeritageOfTheKingdom => "HeritageOfTheKingdom",
+            CompanyBalanceIndicatorKind::PaidSubscribedCapital => "PaidSubscribedCapital",
+            CompanyBalanceIndicatorKind::CapitalTotal => "CapitalTotal",
+            CompanyBalanceIndicatorKind::Provisions => "Provisions",
+            CompanyBalanceIndicatorKind::IncomeInAdvance => "IncomeInAdvance",
+            CompanyBalanceIndicatorKind::Liabilities => "Liabilities",
+            CompanyBalanceIndicatorKind::PrePayments => "PrePayments",
+            CompanyBalanceIndicatorKind::CashAndBankAccounts => "CashAndBankAccounts",
+            CompanyBalanceIndicatorKind::Debt => "Debt",
+            CompanyBalanceIndicatorKind::Inventories => "Inventories",
+            CompanyBalanceIndicatorKind::CurrentAssets => "CurrentAssets",
+            CompanyBalanceIndicatorKind::FixedAssets => "FixedAssets",
+        };
+
+        write!(f, "{}", value)
+    }
 }
 
 impl From<String> for CompanyBalanceIndicatorKind {
@@ -205,6 +257,109 @@ pub enum NgoBalanceIndicatorKind {
     PrePayments,                                      //I3
     CurrentAssetsTotal,                               //I2
     FixedAssetsTotal,                                 //I1
+}
+
+impl Display for NgoBalanceIndicatorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let value = match self {
+            NgoBalanceIndicatorKind::PersonnelEffectiveInEconomicActivity => {
+                "PersonnelEffectiveInEconomicActivity"
+            }
+            NgoBalanceIndicatorKind::PersonnelEffectiveInNonProfitActivity => {
+                "PersonnelEffectiveInNonProfitActivity"
+            }
+            NgoBalanceIndicatorKind::DeficitOrLoss => "DeficitOrLoss",
+            NgoBalanceIndicatorKind::DeficitOrLossProjection => "DeficitOrLossProjection",
+            NgoBalanceIndicatorKind::SurplusOrProfit => "SurplusOrProfit",
+            NgoBalanceIndicatorKind::SurplusOrProfitProjection => "SurplusOrProfitProjection",
+            NgoBalanceIndicatorKind::TotalExpenditures => "TotalExpenditures",
+            NgoBalanceIndicatorKind::TotalExpendituresProjection => "TotalExpendituresProjection",
+            NgoBalanceIndicatorKind::TotalIncome => "TotalIncome",
+            NgoBalanceIndicatorKind::TotalIncomeProjection => "TotalIncomeProjection",
+            NgoBalanceIndicatorKind::LossFromEconomicActivity => "LossFromEconomicActivity",
+            NgoBalanceIndicatorKind::LossFromEconomicActivityProjection => {
+                "LossFromEconomicActivityProjection"
+            }
+            NgoBalanceIndicatorKind::ProfitFromEconomicActivity => "ProfitFromEconomicActivity",
+            NgoBalanceIndicatorKind::ProfitFromEconomicActivityProjection => {
+                "ProfitFromEconomicActivityProjection"
+            }
+            NgoBalanceIndicatorKind::ExpendituresForEconomicActivity => {
+                "ExpendituresForEconomicActivity"
+            }
+            NgoBalanceIndicatorKind::ExpendituresForEconomicActivityProjection => {
+                "ExpendituresForEconomicActivityProjection"
+            }
+            NgoBalanceIndicatorKind::IncomeFromEconomicActivity => "IncomeFromEconomicActivity",
+            NgoBalanceIndicatorKind::IncomeFromEconomicActivityProjection => {
+                "IncomeFromEconomicActivityProjection"
+            }
+            NgoBalanceIndicatorKind::LossFromSpecialPurposesActivity => {
+                "LossFromSpecialPurposesActivity"
+            }
+            NgoBalanceIndicatorKind::LossFromSpecialPurposesActivityProjection => {
+                "LossFromSpecialPurposesActivityProjection"
+            }
+            NgoBalanceIndicatorKind::SurplusFromSpecialPurposesActivity => {
+                "SurplusFromSpecialPurposesActivity"
+            }
+            NgoBalanceIndicatorKind::SurplusFromSpecialPurposesActivityProjection => {
+                "SurplusFromSpecialPurposesActivityProjection"
+            }
+            NgoBalanceIndicatorKind::ExpendituresForSpecialPurposesActivity => {
+                "ExpendituresForSpecialPurposesActivity"
+            }
+            NgoBalanceIndicatorKind::ExpendituresForSpecialPurposesActivityProjection => {
+                "ExpendituresForSpecialPurposesActivityProjection"
+            }
+            NgoBalanceIndicatorKind::IncomeFromSpecialPurposesActivity => {
+                "IncomeFromSpecialPurposesActivity"
+            }
+            NgoBalanceIndicatorKind::IncomeFromSpecialPurposesActivityProjection => {
+                "IncomeFromSpecialPurposesActivityProjection"
+            }
+            NgoBalanceIndicatorKind::DeficitFromNonProfitActivity => "DeficitFromNonProfitActivity",
+            NgoBalanceIndicatorKind::DeficitFromNonProfitActivityProjection => {
+                "DeficitFromNonProfitActivityProjection"
+            }
+            NgoBalanceIndicatorKind::SurplusFromNonProfitActivity => "SurplusFromNonProfitActivity",
+            NgoBalanceIndicatorKind::SurplusFromNonProfitActivityProjection => {
+                "SurplusFromNonProfitActivityProjection"
+            }
+            NgoBalanceIndicatorKind::ExpendituresForNonProfitActivity => {
+                "ExpendituresForNonProfitActivity"
+            }
+            NgoBalanceIndicatorKind::ExpendituresForNonProfitActivityProjection => {
+                "ExpendituresForNonProfitActivityProjection"
+            }
+            NgoBalanceIndicatorKind::IncomeFromNonProfitActivity => "IncomeFromNonProfitActivity",
+            NgoBalanceIndicatorKind::IncomeFromNonProfitActivityProjection => {
+                "IncomeFromNonProfitActivityProjection"
+            }
+            NgoBalanceIndicatorKind::CapitalTotal => "CapitalTotal",
+            NgoBalanceIndicatorKind::FundsForNonProfitActivities => "FundsForNonProfitActivities",
+            NgoBalanceIndicatorKind::OwnedCapitalTotal => "OwnedCapitalTotal",
+            NgoBalanceIndicatorKind::IncomeInAdvance => "IncomeInAdvance",
+            NgoBalanceIndicatorKind::Provisions => "Provisions",
+            NgoBalanceIndicatorKind::LiabilitiesToBePaidInMoreThanOneYear => {
+                "LiabilitiesToBePaidInMoreThanOneYear"
+            }
+            NgoBalanceIndicatorKind::TotalAssetsMinusCurrentLiabilities => {
+                "TotalAssetsMinusCurrentLiabilities"
+            }
+            NgoBalanceIndicatorKind::NetCurrentAssetsAndNetCurrentLiabilities => {
+                "NetCurrentAssetsAndNetCurrentLiabilities"
+            }
+            NgoBalanceIndicatorKind::LiabilitiesToBePaidInLessThanOneYear => {
+                "LiabilitiesToBePaidInLessThanOneYear"
+            }
+            NgoBalanceIndicatorKind::PrePayments => "PrePayments",
+            NgoBalanceIndicatorKind::CurrentAssetsTotal => "CurrentAssetsTotal",
+            NgoBalanceIndicatorKind::FixedAssetsTotal => "FixedAssetsTotal",
+        };
+
+        write!(f, "{}", value)
+    }
 }
 
 impl From<String> for NgoBalanceIndicatorKind {
