@@ -10,10 +10,7 @@ async fn main() -> anyhow::Result<()> {
     let client = AnafClient::new();
     let now = chrono::Local::now().date_naive();
 
-    let request = vec![
-        ApiRequest::new(49201783, now),
-        ApiRequest::new(14399840, now),
-    ];
+    let request = vec![ApiRequest::new(49201783, now)];
 
     let response = client
         .vat_payer(VatPayerApiVersion::V8)

@@ -1,8 +1,8 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub type CultResponse = Vec<CultResponseItem>;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CultResponseItem {
     #[serde(alias = "cui")]
     pub unique_registration_code: usize,

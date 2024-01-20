@@ -24,4 +24,8 @@ impl VatPayerApiVersion {
     pub fn latest() -> Self {
         Self::default()
     }
+
+    pub fn all() -> Vec<Self> {
+        vec![Self::V8, Self::V7]
+    }
 }

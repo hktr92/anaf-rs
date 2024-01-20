@@ -1,4 +1,5 @@
 mod api;
+
 #[cfg(feature = "vat_payer_async_api")]
 mod api_async;
 mod response;

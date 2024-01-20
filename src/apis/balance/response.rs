@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BalanceRawResponse {
     #[serde(alias = "an")]
     pub year: usize,
@@ -22,7 +22,7 @@ pub struct BalanceRawResponse {
     pub balance: Vec<RawBalance>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct BalanceResponse {
     pub year: usize,
     pub unique_registration_code: usize,
@@ -60,7 +60,7 @@ impl From<BalanceRawResponse> for BalanceResponse {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RawBalance {
     #[serde(alias = "indicator")]
     pub code: String,
@@ -72,7 +72,7 @@ pub struct RawBalance {
     pub value: isize,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 pub enum BalanceIndicator {
     Company(CompanyBalanceIndicatorKind),
     Ngo(NgoBalanceIndicatorKind),
@@ -102,7 +102,7 @@ impl BalanceIndicator {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 pub enum CompanyBalanceIndicatorKind {
     AverageNumberOfEmployees, // I20
     NetLoss,                  // I19
@@ -154,7 +154,7 @@ impl From<String> for CompanyBalanceIndicatorKind {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 pub enum NgoBalanceIndicatorKind {
     PersonnelEffectiveInEconomicActivity,             //I46
     PersonnelEffectiveInNonProfitActivity,            //I45

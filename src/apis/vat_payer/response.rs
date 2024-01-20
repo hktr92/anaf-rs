@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::ApiResponse;
 
@@ -21,7 +21,7 @@ impl std::fmt::Display for crate::vat_payer::VatPayerAsyncToken {
 
 pub type VatPayerResponse = ApiResponse<VatPayerResponseItem>;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct VatPayerResponseItem {
     #[serde(alias = "date_generale")]
     pub company_info: CompanyInfo,
@@ -45,7 +45,7 @@ pub struct VatPayerResponseItem {
     pub fiscal_address: Address,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CompanyInfo {
     #[serde(alias = "cui")]
     pub unique_registration_code: usize,
@@ -106,7 +106,7 @@ pub struct CompanyInfo {
     pub juridic_form: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct VatScope {
     #[serde(alias = "scpTVA")]
     pub is_payer: bool,
@@ -116,7 +116,7 @@ pub struct VatScope {
     pub payer_interval: VatPayerInterval,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct VatPayerInterval {
     #[serde(alias = "data_inceput_ScpTVA")]
     pub from: Option<String>,
@@ -131,7 +131,7 @@ pub struct VatPayerInterval {
     pub cancelled_reason: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct VatPayerIncome {
     #[serde(alias = "dataInceputTvaInc")]
     pub from: String,
@@ -147,7 +147,7 @@ pub struct VatPayerIncome {
     pub status: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct InactiveStatus {
     #[serde(alias = "dataInactivare")]
     pub deactivated_at: String,
@@ -161,7 +161,7 @@ pub struct InactiveStatus {
     pub status: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct VatSplit {
     #[serde(alias = "dataInceputSplitTVA")]
     pub started_at: String,
@@ -173,7 +173,7 @@ pub struct VatSplit {
     pub status: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Address {
     #[serde(alias = "sdenumire_Strada", alias = "ddenumire_Strada")]
     pub street: String,
